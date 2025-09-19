@@ -1,40 +1,45 @@
-import { useState } from "react"; // React hook to manage state
-import { quotes } from "../data/quotes"; // Import the local quotes array
+import { useState, useEffect } from "react";
+import { quotes as localQuotes } from "../data/quotes";
 
 function Quote() {
-  // useState hooks to store the current quote and author
-  const [quote, setQuote] = useState(quotes[0].content); // Initialize with the first quote
-  const [author, setAuthor] = useState(quotes[0].author);
+  const [quote, setQuote] = useState(localQuotes[0].content);
+  const [author, setAuthor] = useState(localQuotes[0].author);
+  const [loading, setLoading] = useState(true);
 
-  // Function to select a random quote from the array
-  const fetchQuote = () => {
-    const random = quotes[Math.floor(Math.random() * quotes.length)]; // Math.random() selects random index
-    setQuote(random.content); // Update quote state
-    setAuthor(random.author); // Update author state
+  const fetchQuoteFromAPI = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("https://zenquotes.io/api/random");
+      if (!response.ok) throw new Error("API failed");
+
+      const data = await response.json();
+      setQuote(data[0].q);
+      setAuthor(data[0].a);
+      setLoading(false);
+    } catch (error) {
+      console.warn("API failed, using local quotes", error);
+      const random = localQuotes[Math.floor(Math.random() * localQuotes.length)];
+      setQuote(random.content);
+      setAuthor(random.author);
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    fetchQuoteFromAPI();
+  }, []);
+
   return (
-    // Outer div: center card with padding, white background, rounded corners, shadow, text centered
     <div className="w-96 h-80 p-8 bg-white rounded-2xl shadow-2xl text-center flex flex-col justify-between">
-
-
-      
-      {/* Quote text */}
       <p className="text-lg md:text-xl italic mb-4 text-gray-800">
-        "{quote}"
+        {loading ? "" : `"${quote}"`}
       </p>
-      
-
-      {/* Quote author */}
-      <p className="text-md md:text-lg font-semibold mb-6 text-gray-600 ">
-        " {author} "
+      <p className="text-md md:text-lg font-semibold mb-6 text-gray-600">
+        {loading ? "" : `- ${author}`}
       </p>
-
-      {/* Button to get a new random quote */}
       <button
-        onClick={fetchQuote} // Call fetchQuote when button is clicked
-        className="bg-purple-500 text-white px-6 py-2 rounded-full shadow-lg 
-                   hover:bg-purple-600 transition-colors duration-300"
+        onClick={fetchQuoteFromAPI}
+        className="bg-purple-500 text-white px-6 py-2 rounded-full shadow-lg hover:bg-purple-600 transition-colors duration-300"
       >
         New Quote
       </button>
@@ -42,4 +47,4 @@ function Quote() {
   );
 }
 
-export default Quote; // Export the component so App.jsx can import it
+export default Quote;
