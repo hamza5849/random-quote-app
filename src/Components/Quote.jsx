@@ -15,16 +15,19 @@ function Quote() {
 
   return (
     // Outer div: center card with padding, white background, rounded corners, shadow, text centered
-    <div className="max-w-md mx-auto p-8 bg-white rounded-2xl shadow-2xl text-center">
+    <div className="w-96 h-80 p-8 bg-white rounded-2xl shadow-2xl text-center flex flex-col justify-between">
+
+
       
       {/* Quote text */}
       <p className="text-lg md:text-xl italic mb-4 text-gray-800">
         "{quote}"
       </p>
+      
 
       {/* Quote author */}
-      <p className="text-md md:text-lg font-semibold mb-6 text-gray-600">
-        - {author}
+      <p className="text-md md:text-lg font-semibold mb-6 text-gray-600 ">
+        " {author} "
       </p>
 
       {/* Button to get a new random quote */}
